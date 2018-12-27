@@ -38,7 +38,7 @@ void KalmanFilter::Update(const VectorXd &z) {
   VectorXd y = z -H_ * x_;
   MatrixXd Ht = H_.transpose();
   MatrixXd S =H_ * P_ * Ht + R_;
-  MatrixXd Si = S.inverse()
+  MatrixXd Si = S.inverse();
   MatrixXd K = P_ * Ht * Si;
 
    //new estimate
@@ -54,13 +54,13 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   /**
    * TODO: update the state by using Extended Kalman Filter equations
    */
-
+  //convert the cartesian coordinates x_ to polar coordinates
   float px = x_(0);
   float py = x_(1);
   float vx = x_(2);
   float vy = x_(3);
   float ro = sqrt(px*px +py*py);
-  float phi = atan2(py/px);
+  float phi = atan2(py, px);
   float ro_dot;
 
   if (fabs(ro) < 0.0001) {
@@ -70,13 +70,21 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
     ro_dot = (px*vx + py*vy)/ro;
   }
 
-  x_pred = VectorXd(3);
+  VectorXd x_pred(3);
   x_pred << ro, phi, ro_dot;
   VectorXd y = z - H_ * x_pred;
   MatrixXd Ht = H_.transpose();
-  MatrixXd S =H_ * P_ * Ht + R_;
-  MatrixXd Si = S.inverse()
+  MatrixXd S = H_ * P_ * Ht + R_;
+  MatrixXd Si = S.inverse();
   MatrixXd K = P_ * Ht * Si;
+
+  // Wrap angle for y[1] between +/- pi
+  if (y[1] < -M_PI) {
+	y[1] += 2 * M_PI;
+  }
+  else if (y(1) > M_PI) {
+	y[1] -= 2 * M_PI;
+  }
 
   //new estimate
   x_ = x_ + K * y;
