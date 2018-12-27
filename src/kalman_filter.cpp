@@ -36,10 +36,10 @@ void KalmanFilter::Update(const VectorXd &z) {
    * TODO: update the state by using Kalman Filter equations
    */
   VectorXd y = z -H_ * x_;
-  MatrixXd Ht = H_.transpose();
-  MatrixXd S =H_ * P_ * Ht + R_;
+  MatrixXd PHt = P_* H_.transpose();
+  MatrixXd S =H_ * PHt + R_;
   MatrixXd Si = S.inverse();
-  MatrixXd K = P_ * Ht * Si;
+  MatrixXd K = PHt * Si;
 	
   // Wrap angle for y[1] between +/- pi
   if (y[1] < -M_PI) {
@@ -81,10 +81,10 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   VectorXd x_pred(3);
   x_pred << ro, phi, ro_dot;
   VectorXd y = z - H_ * x_pred;
-  MatrixXd Ht = H_.transpose();
-  MatrixXd S = H_ * P_ * Ht + R_;
+  MatrixXd PHt = P_* H_.transpose();
+  MatrixXd S = H_ * PHt + R_;
   MatrixXd Si = S.inverse();
-  MatrixXd K = P_ * Ht * Si;
+  MatrixXd K = PHt * Si;
 
   // Wrap angle for y[1] between +/- pi
   if (y[1] < -M_PI) {
