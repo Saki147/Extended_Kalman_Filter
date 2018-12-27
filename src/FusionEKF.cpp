@@ -99,12 +99,11 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       // TODO: Initialize state.
       float px = measurement_pack.raw_measurements_(0);
       float py = measurement_pack.raw_measurements_(1);
-      float vx = 0;
-      float vy = 0;
       ekf_.x_(0) = px;
       ekf_.x_(1) = py;
-      ekf_.x_(2) = vx;
-      ekf_.x_(3) = vy;
+      ekf_.x_(2) = 0;
+      ekf_.x_(3) = 0;
+
     }
 
 
@@ -141,7 +140,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   //update the process noise covariance matrix Q
   ekf_.Q_ = MatrixXd(4,4);
   ekf_.Q_ << dt_4*noise_ax/4, 0, dt_3*noise_ax/2, 0,
-                0, dt_4*noise_ay, 0, dt_3*noise_ay,
+                0, dt_4*noise_ay/4, 0, dt_3*noise_ay/2,
                 dt_3*noise_ax/2, 0, dt_2*noise_ax, 0,
                 0, dt_3*noise_ay/2, 0, dt_2*noise_ay;
 
@@ -162,10 +161,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
     // TODO: Radar updates
-    Hj_ = tools.CalculateJacobian(ekf_.x_);
-    ekf_.H_ = Hj_;
+    //update Hj_
+    ekf_.H_ = tools.CalculateJacobian(ekf_.x_);
     ekf_.R_ = R_radar_;
-	ekf_.UpdateEKF(measurement_pack.raw_measurements_);
+	  ekf_.UpdateEKF(measurement_pack.raw_measurements_);
 
 
   }
