@@ -40,6 +40,14 @@ void KalmanFilter::Update(const VectorXd &z) {
   MatrixXd S =H_ * P_ * Ht + R_;
   MatrixXd Si = S.inverse();
   MatrixXd K = P_ * Ht * Si;
+	
+  // Wrap angle for y[1] between +/- pi
+  if (y[1] < -M_PI) {
+	y[1] += 2 * M_PI;
+  }
+  else if (y(1) > M_PI) {
+	y[1] -= 2 * M_PI;
+  }
 
    //new estimate
   x_ = x_ + K * y;
