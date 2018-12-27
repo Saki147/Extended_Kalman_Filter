@@ -4,6 +4,8 @@
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
 using std::vector;
+using std::cout;
+using std::endl;
 
 Tools::Tools() {}
 
@@ -41,6 +43,9 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 
   // calculate the squared root
   rmse = rmse.array().sqrt();
+
+  // return the result
+  return rmse;
 
 }
 
